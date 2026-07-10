@@ -1,0 +1,2 @@
+run,dump,frame,n_sites,vacancies,interstitials,frenkel_pairs,antisites_on_Fe_sites,vac_clusters,vac_largest,vac_mono_frac,vac_clustered_frac,int_clusters,int_largest,int_mono_frac,int_clustered_frac,nrt_displacements,survival_eff_nrt,dpa_per_cascade,arc_displacements,survival_eff_arc,int_density_m3,int_loop_diam_nm,hardening_MPa
+1,traj_Fe_relax_1.lammpstrj,7,250000,25,25,25,0,5,4,0.52,0.48,18,10,0.0,1.0,74.18,0.3370383701353257,0.0002967021231435714,25.8,0.9688986866951714,6.188e+24,0.395,1227.5

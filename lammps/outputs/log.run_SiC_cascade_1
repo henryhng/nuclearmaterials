@@ -1,0 +1,189 @@
+LAMMPS (22 Jul 2025 - Update 4)
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread.
+  using 1 OpenMP thread(s) per MPI task
+clear
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread.
+  using 1 OpenMP thread(s) per MPI task
+units           metal
+atom_style      atomic
+atom_modify     map yes
+boundary        p p p
+
+variable        seed index 12345
+variable        pkaid index 196737
+variable        runid index 1
+variable        nx index 0.16903
+variable        ny index 0.50709
+variable        nz index 0.84515
+
+read_restart    outputs/sic_equil.restart
+Reading restart file ...
+  restart file = 22 Jul 2025, LAMMPS = 22 Jul 2025
+  restoring atom style atomic from restart
+  orthogonal box = (-0.053959293 -0.053959293 -0.053959293) to (139.56116 139.56116 139.56116)
+  1 by 2 by 3 MPI processor grid
+  pair style gw/zbl stores no restart info
+  262144 atoms
+  read_restart CPU = 0.178 seconds
+
+# 3C-SiC (zinc-blende), Gao-Weber 2002 potential
+pair_style      gw/zbl
+pair_coeff      * * potentials/SiC.gw.zbl Si C
+Reading gw/zbl potential file potentials/SiC.gw.zbl with DATE: 2016-05-06
+
+mass            1 28.085
+mass            2 12.011
+
+neighbor        2.0 bin
+neigh_modify    delay 0 every 1 check yes
+
+thermo          100
+thermo_style    custom step temp pe ke etotal press dt time
+thermo_modify   flush yes
+
+velocity        all create 300.0 ${seed} dist gaussian
+velocity        all create 300.0 1001 dist gaussian
+fix             1 all nvt temp 300.0 300.0 0.1
+run             2000
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 4.5
+  ghost atom cutoff = 4.5
+  binsize = 2.25, bins = 63 63 63
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair gw/zbl, perpetual
+      attributes: full, newton on
+      pair build: full/bin/atomonly
+      stencil: full/bin/3d
+      bin: standard
+Per MPI rank memory allocation (min/avg/max) = 18.66 | 18.78 | 19.01 Mbytes
+   Step          Temp          PotEng         KinEng         TotEng         Press            Dt            Time     
+      5001   300           -1670580.9      10165.393     -1660415.5      135.46277      0.001          5            
+      5100   299.50612     -1670544.1      10148.658     -1660395.4      246.46804      0.001          5.099        
+      5200   299.93042     -1670526.3      10163.035     -1660363.2      243.94506      0.001          5.199        
+      5300   302.36007     -1670605        10245.363     -1660359.7      253.82708      0.001          5.299        
+      5400   299.96132     -1670534.9      10164.082     -1660370.9      258.25309      0.001          5.399        
+      5500   299.69197     -1670540.9      10154.955     -1660385.9      234.59679      0.001          5.499        
+      5600   299.6834      -1670558.8      10154.665     -1660404.1      186.94856      0.001          5.599        
+      5700   298.95968     -1670561.8      10130.142     -1660431.6      195.15998      0.001          5.699        
+      5800   299.58052     -1670571.2      10151.179     -1660420        236.22082      0.001          5.799        
+      5900   299.95849     -1670543.6      10163.986     -1660379.6      238.12658      0.001          5.899        
+      6000   300.28068     -1670540.2      10174.904     -1660365.3      215.84832      0.001          5.999        
+      6100   299.90781     -1670526.9      10162.269     -1660364.6      244.55459      0.001          6.099        
+      6200   298.86013     -1670513.2      10126.769     -1660386.4      237.44494      0.001          6.199        
+      6300   298.60897     -1670537.3      10118.258     -1660419        185.44655      0.001          6.299        
+      6400   300.42372     -1670593.4      10179.75      -1660413.7      227.81016      0.001          6.399        
+      6500   300.12961     -1670538.6      10169.785     -1660368.8      228.36536      0.001          6.499        
+      6600   300.39829     -1670543.3      10178.888     -1660364.4      230.22077      0.001          6.599        
+      6700   300.85443     -1670571.1      10194.345     -1660376.7      190.31296      0.001          6.699        
+      6800   299.80394     -1670552.7      10158.749     -1660393.9      249.00254      0.001          6.799        
+      6900   299.35941     -1670546.8      10143.686     -1660403.2      197.97243      0.001          6.899        
+      7000   299.84613     -1670536.2      10160.179     -1660376        213.91819      0.001          6.999        
+      7001   299.85676     -1670536.1      10160.539     -1660375.6      215.1083       0.001          7            
+Loop time of 221.299 on 6 procs for 2000 steps with 262144 atoms
+
+Performance: 0.781 ns/day, 30.736 hours/ns, 9.038 timesteps/s, 2.369 Matom-step/s
+96.2% CPU use with 6 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 159.92     | 169.35     | 211.39     | 144.6 | 76.53
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 6.1981     | 48.198     | 57.596     | 270.8 | 21.78
+Output  | 0.014631   | 0.017192   | 0.028032   |   3.7 |  0.01
+Modify  | 2.3443     | 2.4953     | 2.5872     |   4.8 |  1.13
+Other   |            | 1.238      |            |       |  0.56
+
+Nlocal:        43690.7 ave       44080 max       43488 min
+Histogram: 3 1 0 0 0 0 0 0 1 1
+Nghost:        20003.5 ave       20209 max       19603 min
+Histogram: 1 1 0 0 0 0 0 0 1 3
+Neighs:              0 ave           0 max           0 min
+Histogram: 6 0 0 0 0 0 0 0 0 0
+FullNghs:  1.46869e+06 ave 1.48198e+06 max 1.46175e+06 min
+Histogram: 3 1 0 0 0 0 0 0 1 1
+
+Total # of neighbors = 8812118
+Ave neighs/atom = 33.615562
+Neighbor list builds = 0
+Dangerous builds = 0
+unfix           1
+
+group           pka id ${pkaid}
+group           pka id 196737
+1 atoms in group pka
+# Si PKA, 10 keV: v = sqrt(2E/m_Si). Hard-coded; mass[] indexes by type not id.
+variable        vtot equal 2621.25
+velocity        pka set $(v_vtot*v_nx) $(v_vtot*v_ny) $(v_vtot*v_nz) units box
+velocity        pka set 710.64021607475740439 $(v_vtot*v_ny) $(v_vtot*v_nz) units box
+velocity        pka set 710.64021607475740439 2354.5933050399207787 $(v_vtot*v_nz) units box
+velocity        pka set 710.64021607475740439 2354.5933050399207787 906.54973038350431125 units box
+
+lattice         diamond 4.3596
+Lattice spacing in x,y,z = 4.3596 4.3596 4.3596
+region          core block 4 28 4 28 4 28 side in
+region          boundary block 4 28 4 28 4 28 side out
+group           core_atoms region core
+109040 atoms in group core_atoms
+group           boundary_atoms region boundary
+153104 atoms in group boundary_atoms
+
+fix             2 core_atoms nve
+fix             3 boundary_atoms nvt temp 300.0 300.0 0.1
+fix             4 all dt/reset 1 NULL 0.001 0.05 units box
+fix             5 all electron/stopping 10.0 potentials/elstop_SiC.txt
+
+dump            d1 all custom 500 outputs/traj_SiC_spike_${runid}.lammpstrj id type x y z
+dump            d1 all custom 500 outputs/traj_SiC_spike_1.lammpstrj id type x y z
+dump_modify     d1 first yes
+run             20000
+Neighbor list info ...
+  update: every = 1 steps, delay = 0 steps, check = yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 4.5
+  ghost atom cutoff = 4.5
+  binsize = 2.25, bins = 63 63 63
+  2 neighbor lists, perpetual/occasional/extra = 1 1 0
+  (1) pair gw/zbl, perpetual
+      attributes: full, newton on
+      pair build: full/bin/atomonly
+      stencil: full/bin/3d
+      bin: standard
+  (2) fix electron/stopping, occasional, copy from (1)
+      attributes: full, newton on
+      pair build: copy
+      stencil: none
+      bin: none
+Per MPI rank memory allocation (min/avg/max) = 18.91 | 19.03 | 19.26 Mbytes
+   Step          Temp          PotEng         KinEng         TotEng         Press            Dt            Time     
+      7001   594.97533     -1670536.1      20160.526     -1650375.6      4139.9413      1.9074869e-05  7            
+      7100   589.92418     -1670432.3      19989.37      -1650442.9      4132.5686      1.924581e-05   7.0018962    
+      7200   588.79003     -1670461.9      19950.939     -1650511        4103.3581      1.9295025e-05  7.0038201    
+      7300   586.88023     -1670464.8      19886.227     -1650578.5      4076.9559      1.9394427e-05  7.0057579    
+      7400   585.65896     -1670491        19844.844     -1650646.1      4084.634       1.9474456e-05  7.0077047    
+      7500   583.82592     -1670496.3      19782.732     -1650713.6      4064.2043      1.9543173e-05  7.0096567    
+      7600   581.8863      -1670497.6      19717.009     -1650780.6      4058.8024      1.9737535e-05  7.0116321    
+      7700   579.21806     -1670474.6      19626.597     -1650848        4076.8056      1.9955669e-05  7.0136285    
+      7800   574.01596     -1670365.6      19450.326     -1650915.3      4084.7464      2.0135558e-05  7.0156323    
+      7900   574.86466     -1670461.4      19479.083     -1650982.3      4066.5826      2.0114814e-05  7.0176453    
+      8000   570.29248     -1670373.1      19324.157     -1651048.9      4071.6126      2.0418875e-05  7.0196728    
+      8100   568.36373     -1670374.6      19258.801     -1651115.8      4038.8965      2.047129e-05   7.0217142    
+      8200   564.53795     -1670335.7      19129.166     -1651206.5      4018.0787      2.5788788e-05  7.0238864    
+      8300   554.85734     -1670098.2      18801.142     -1651297        4107.7183      2.6146421e-05  7.0264702    
+      8400   554.28303     -1670181.2      18781.682     -1651399.5      4030.6288      2.6088513e-05  7.0290806    
+      8500   530.08047     -1669468.1      17961.587     -1651506.6      4096.8085      2.8806296e-05  7.0317195    
+      8600   544.71443     -1670081.3      18457.454     -1651623.8      4110.7949      3.2032011e-05  7.034869     
+      8700   538.88766     -1670008.2      18260.015     -1651748.2      4114.0235      3.255583e-05   7.0381119    
+      8800   530.27848     -1669846.9      17968.296     -1651878.6      4129.42        3.4760638e-05  7.041558     
+      8900   524.17696     -1669775.3      17761.549     -1652013.7      4175.8198      3.5082744e-05  7.0450681    
+      9000   517.49984     -1669700.3      17535.297     -1652165        4189.0576      4.1649021e-05  7.0489902    
+      9100   502.53006     -1669356        17028.051     -1652327.9      4428.7876      4.5721025e-05  7.0532325    
+      9200   495.0173      -1669271.8      16773.484     -1652498.4      4547.9888      4.8598457e-05  7.0579401    
+      9300   473.72007     -1668709.9      16051.835     -1652658        4721.3566      5.2199251e-05  7.0630255    
+      9400   475.17272     -1668918.5      16101.058     -1652817.5      4932.133       5.2342298e-05  7.0682595    
+      9500   459.13806     -1668550.2      15557.729     -1652992.4      5158.2155      7.0823698e-05  7.0747068    
+      9600   445.09175     -1668253.2      15081.775     -1653171.4      5550.3907      7.4556261e-05  7.0820741    
+      9700   427.04793     -1667823.3      14470.366     -1653352.9      5711.5296      0.00010446658  7.0907503    
+      9800   409.4957      -1667432.2      13875.615     -1653556.6      5999.5684      0.0001548273   7.1026933    

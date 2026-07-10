@@ -1,0 +1,4 @@
+numpy
+ovito
+matplotlib
+tqdm

@@ -1,0 +1,33 @@
+clear
+units           metal
+atom_style      atomic
+boundary        p p p
+
+lattice         bcc 3.165
+region          box block 0 50 0 50 0 50
+create_box      1 box
+create_atoms    1 region box
+
+pair_style      eam/alloy
+pair_coeff      * * potentials/W_zhou_zbl.eam.alloy W
+
+mass            1 183.84
+
+neighbor        2.0 bin
+neigh_modify    delay 0 every 1 check yes
+
+write_data      structures/perfect_lattice_W.data
+
+thermo          100
+thermo_style    custom step temp pe ke etotal press vol
+thermo_modify   flush yes
+
+min_style       cg
+minimize        1.0e-6 1.0e-8 1000 10000
+
+velocity        all create 300.0 54321 dist gaussian
+fix             1 all npt temp 300.0 300.0 0.1 iso 0.0 0.0 1.0
+run             5000
+unfix           1
+
+write_restart   outputs/w_equil.restart
