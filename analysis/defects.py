@@ -99,10 +99,14 @@ def analyze(dump_path: Path, reference: Path, frame: int, mat: dict | None,
         n = int(np.count_nonzero(anti_mask & (site_types == tid)))
         antisites[f"antisites_on_{name}_sites"] = n
 
+    # Occupancy is per-type-component when the cell has >1 species.
+    ntypes = occupancy.shape[1]
+    occ = ("Occupancy" if ntypes == 1 else
+           "(" + "+".join(f"Occupancy.{i}" for i in range(1, ntypes + 1)) + ")")
     vac_sizes, vol = cluster_sizes(dump_path, reference, frame, cutoff,
-                                   displaced=False, expr="Occupancy==0")
+                                   displaced=False, expr=f"{occ}==0")
     int_sizes, _ = cluster_sizes(dump_path, reference, frame, cutoff,
-                                 displaced=True, expr="Occupancy>1")
+                                 displaced=True, expr=f"{occ}>1")
 
     row = {
         "run": run_label(dump_path),
