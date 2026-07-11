@@ -6,6 +6,7 @@
 
 import argparse
 import sys
+import tempfile
 from pathlib import Path
 
 import numpy as np
@@ -229,8 +230,8 @@ def main():
     renderer = TachyonRenderer(
         ambient_occlusion=not args.fast, shadows=not args.fast)
 
-    scratch = Path("/tmp/claude-1000") / "cascade_anim"
-    scratch.mkdir(parents=True, exist_ok=True)
+    # Unique per run: concurrent renders must not share frame files.
+    scratch = Path(tempfile.mkdtemp(prefix="cascade_anim_"))
     png_paths = []
     for i, f in enumerate(frames):
         pipeline, _, _ = build_pipeline(
