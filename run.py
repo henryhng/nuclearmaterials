@@ -54,7 +54,8 @@ def last_step(log_path: Path) -> int:
 def run_deck(deck: str, label: str, nsteps: int, args, cwd: Path,
              lmp_vars=None) -> None:
     logname = label.split("/")[0].strip().replace(" ", "_")
-    log = cwd / "outputs" / f"log.run_{args.material}_{logname}"
+    log = cwd / "outputs" / "logs" / f"log.run_{args.material}_{logname}"
+    log.parent.mkdir(parents=True, exist_ok=True)
     cmd = ["mpirun", "-np", str(args.np), args.lmp,
            "-in", deck, "-log", str(log)]
     for name, val in (lmp_vars or {}).items():
@@ -130,6 +131,7 @@ def main():
     outputs = cwd / "outputs"
     structures = cwd / "structures"
     outputs.mkdir(exist_ok=True)
+    (outputs / "results").mkdir(exist_ok=True)
     structures.mkdir(exist_ok=True)
 
     if not args.analyze_only:
@@ -167,9 +169,9 @@ def main():
         [py, str(HERE / "analysis" / "defects.py"),
          *map(str, trajs), "--reference", str(structures / mat["reference"]),
          "--material", args.material,
-         "--out", str(outputs / f"results_{args.material}.csv")],
+         "--out", str(outputs / "results" / f"results_{args.material}.csv")],
         env=env, check=True)
-    print(f"results: {outputs / f'results_{args.material}.csv'}")
+    print(f"results: {outputs / 'results' / f'results_{args.material}.csv'}")
 
 
 if __name__ == "__main__":

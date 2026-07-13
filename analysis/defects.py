@@ -41,7 +41,12 @@ def _ws(reference: Path, displaced: bool) -> WignerSeitzAnalysisModifier:
 
 def cluster_sizes(dump_path: Path, reference: Path, frame: int, cutoff: float,
                   displaced: bool, expr: str):
-    """Cluster sizes of selected defect sites plus the cell volume [A^3]."""
+    """Cluster sizes in defect units plus the cell volume [A^3].
+
+    Displaced config selects every atom of a multi-occupied site, so a
+    lone dumbbell is 2 atoms; weight each atom (occ-1)/occ to count
+    defects, not atoms.
+    """
     pipeline = import_file(str(dump_path))
     pipeline.modifiers.append(_ws(reference, displaced))
     pipeline.modifiers.append(ExpressionSelectionModifier(expression=expr))
@@ -49,9 +54,19 @@ def cluster_sizes(dump_path: Path, reference: Path, frame: int, cutoff: float,
         cutoff=cutoff, only_selected=True, sort_by_size=True))
     data = pipeline.compute(frame)
     n = data.attributes["ClusterAnalysis.cluster_count"]
-    sizes = (np.asarray(data.tables["clusters"]["Cluster Size"])
-             if n > 0 else np.array([], dtype=int))
-    return sizes, data.cell.volume
+    if n == 0:
+        return np.array([], dtype=int), data.cell.volume
+    if not displaced:
+        sizes = np.asarray(data.tables["clusters"]["Cluster Size"])
+        return sizes.astype(int), data.cell.volume
+    cid = np.asarray(data.particles["Cluster"])
+    occ = np.asarray(data.particles["Occupancy"])
+    if occ.ndim > 1:
+        occ = occ.sum(axis=1)
+    w = (occ - 1) / occ
+    sizes = np.bincount(cid[cid > 0], weights=w[cid > 0])[1:]
+    sizes = np.rint(sizes[sizes > 0.49]).astype(int)
+    return np.maximum(sizes, 1), data.cell.volume
 
 
 def cluster_stats(sizes: np.ndarray, prefix: str) -> dict:
@@ -99,6 +114,18 @@ def analyze(dump_path: Path, reference: Path, frame: int, mat: dict | None,
         n = int(np.count_nonzero(anti_mask & (site_types == tid)))
         antisites[f"antisites_on_{name}_sites"] = n
 
+    # Per-species split: vacancies by sublattice; interstitials are the
+    # extras at multi-occupied sites after one resident (own species if
+    # present, else the most abundant) is removed.
+    extras = occupancy.copy()
+    resident = np.where(own >= 1, site_types - 1, occupancy.argmax(axis=1))
+    extras[np.arange(len(site_types)), resident] -= (total > 0)
+    per_species = {}
+    for tid, name in sorted(type_names.items()):
+        per_species[f"vac_{name}"] = int(
+            np.count_nonzero((total == 0) & (site_types == tid)))
+        per_species[f"int_{name}"] = int(extras[total > 1, tid - 1].sum())
+
     # Occupancy is per-type-component when the cell has >1 species.
     ntypes = occupancy.shape[1]
     occ = ("Occupancy" if ntypes == 1 else
@@ -117,6 +144,7 @@ def analyze(dump_path: Path, reference: Path, frame: int, mat: dict | None,
         "interstitials": interstitials,
         "frenkel_pairs": frenkel,
         **antisites,
+        **per_species,
         **cluster_stats(vac_sizes, "vac"),
         **cluster_stats(int_sizes, "int"),
     }

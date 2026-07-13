@@ -31,8 +31,8 @@ run             2000
 unfix           1
 
 group           pka id ${pkaid}
-variable        epka equal 10000.0
-variable        vtot equal sqrt(2.0*v_epka/(mass[${pkaid}]*1.0364269e-4))
+# Fe PKA, 10 keV: v = sqrt(2E/m_Fe). Hard-coded; mass[] indexes by type not id.
+variable        vtot equal 1858.89
 velocity        pka set $(v_vtot*v_nx) $(v_vtot*v_ny) $(v_vtot*v_nz) units box
 
 lattice         bcc 2.855

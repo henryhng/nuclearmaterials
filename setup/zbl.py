@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Splice ZBL short-range repulsion into a single-element EAM setfl table.
 
-    python3 harden.py ../archive/lammps/Fe_mm.eam.fs \
+    python3 zbl.py ../archive/lammps/Fe_mm.eam.fs \
         ../lammps/Fe_mm_zbl.eam.fs --z 26
 """
 

@@ -22,9 +22,11 @@ MATERIALS = {
           "arc_b": -0.564, "arc_c": 0.119,
           "shear": 161e9, "burgers": 0.2741e-9, "taylor": 3.06, "alpha": 0.4,
           "cutoff": 4.1, "nn": 2.74, "metal": True},
-    # Compound: composition-averaged Z/A/e_d, dpa is approximate; covalent
-    # ceramic so metal-glide hardening is not applied.
-    "SiC": {"Z": 10.0, "A": 20.05, "e_d": 30.0, "a0": 4.36, "atoms_cell": 8,
+    # Compound: composition-averaged Z/A, dpa is approximate; covalent
+    # ceramic so metal-glide hardening is not applied. e_d per sublattice
+    # (convention values; potential-consistent averages in ed_results_*.csv).
+    "SiC": {"Z": 10.0, "A": 20.05, "e_d": {"Si": 35.0, "C": 20.0},
+            "a0": 4.36, "atoms_cell": 8,
             "arc_b": None, "arc_c": None,
             "shear": 192e9, "burgers": 0.308e-9, "taylor": 3.06, "alpha": 0.4,
             "cutoff": 3.0, "nn": 1.89, "metal": False},
@@ -33,6 +35,14 @@ MATERIALS = {
 
 def get(material: str) -> dict | None:
     return MATERIALS.get(material)
+
+
+def effective_e_d(mat: dict) -> float:
+    """Scalar e_d, or stoichiometric harmonic mean for compounds."""
+    ed = mat["e_d"]
+    if isinstance(ed, dict):
+        return len(ed) / sum(1.0 / e for e in ed.values())
+    return ed
 
 
 def atomic_volume(mat: dict) -> float:
@@ -75,9 +85,10 @@ def dispersed_barrier(density: float, diameter: float, mat: dict) -> float:
 
 def dpa_metrics(pka_ev: float, mat: dict) -> dict:
     """NRT / arc displacement counts for one PKA in this material."""
+    e_d = effective_e_d(mat)
     t_dm = damage_energy(pka_ev, mat["Z"], mat["A"])
-    nrt = nrt_displacements(t_dm, mat["e_d"])
-    xi = arc_efficiency(t_dm, mat["e_d"], mat["arc_b"], mat["arc_c"])
+    nrt = nrt_displacements(t_dm, e_d)
+    xi = arc_efficiency(t_dm, e_d, mat["arc_b"], mat["arc_c"])
     arc = nrt * xi if xi is not None else None
     return {"damage_energy_eV": t_dm, "nrt_displacements": nrt,
             "arc_efficiency": xi, "arc_displacements": arc}

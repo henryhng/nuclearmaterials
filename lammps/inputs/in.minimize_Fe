@@ -1,0 +1,31 @@
+clear
+units           metal
+atom_style      atomic
+atom_modify     map yes
+boundary        p p p
+
+variable        snap index outputs/fe_equil.restart
+variable        tag index equil
+
+read_restart    ${snap}
+
+pair_style      eam/fs
+pair_coeff      * * potentials/Fe_mm_zbl.eam.fs Fe
+
+mass            1 55.845
+
+neighbor        2.0 bin
+neigh_modify    delay 0 every 1 check yes
+
+thermo          50
+thermo_style    custom step temp pe fnorm
+
+min_style       cg
+minimize        1e-10 1e-8 5000 20000
+
+variable        fpe equal pe
+print           "MINPE ${tag} ${fpe}"
+
+compute         pe all pe/atom
+dump            d1 all custom 1 outputs/minimized/min_Fe_${tag}.lammpstrj id type x y z c_pe
+run             0

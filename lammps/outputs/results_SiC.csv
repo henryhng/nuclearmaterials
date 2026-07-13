@@ -1,2 +1,0 @@
-run,dump,frame,n_sites,vacancies,interstitials,frenkel_pairs,antisites_on_Si_sites,antisites_on_C_sites,vac_clusters,vac_largest,vac_mono_frac,vac_clustered_frac,int_clusters,int_largest,int_mono_frac,int_clustered_frac,nrt_displacements,survival_eff_nrt,dpa_per_cascade
-1,traj_SiC_relax_1.lammpstrj,25,262144,157,157,157,12,14,23,7,0.5859872611464968,0.4140127388535032,114,12,0.0,1.0,86.95,1.8056071106056528,0.00033101565083251845
