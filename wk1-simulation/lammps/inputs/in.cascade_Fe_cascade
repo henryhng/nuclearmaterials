@@ -1,0 +1,59 @@
+clear
+units           metal
+atom_style      atomic
+atom_modify     map yes
+boundary        p p p
+
+variable        seed index 12345
+variable        pkaid index 125000
+variable        runid index 1
+variable        nx index 0.16903
+variable        ny index 0.50709
+variable        nz index 0.84515
+
+read_restart    outputs/fe_equil.restart
+
+pair_style      eam/fs
+pair_coeff      * * potentials/Fe_mm_zbl.eam.fs Fe
+
+mass            1 55.845
+
+neighbor        2.0 bin
+neigh_modify    delay 0 every 1 check yes
+
+thermo          100
+thermo_style    custom step temp pe ke etotal press dt time
+thermo_modify   flush yes
+
+velocity        all create 300.0 ${seed} dist gaussian
+fix             1 all nvt temp 300.0 300.0 0.1
+run             2000
+unfix           1
+
+group           pka id ${pkaid}
+# Fe PKA, 10 keV: v = sqrt(2E/m_Fe). Hard-coded; mass[] indexes by type not id.
+variable        vtot equal 1858.89
+velocity        pka set $(v_vtot*v_nx) $(v_vtot*v_ny) $(v_vtot*v_nz) units box
+
+lattice         bcc 2.855
+region          core block 4 46 4 46 4 46 side in
+region          boundary block 4 46 4 46 4 46 side out
+group           core_atoms region core
+group           boundary_atoms region boundary
+
+fix             2 core_atoms nve
+fix             3 boundary_atoms nvt temp 300.0 300.0 0.1
+fix             4 all dt/reset 1 NULL 0.001 0.05 units box
+fix             5 all electron/stopping 10.0 potentials/elstop_Fe.txt
+
+dump            d1 all custom 500 outputs/traj_Fe_spike_${runid}.lammpstrj id type x y z
+dump_modify     d1 first yes
+run             20000
+undump          d1
+
+unfix           4
+timestep        0.001
+dump            d2 all custom 1000 outputs/traj_Fe_relax_${runid}.lammpstrj id type x y z
+run             8000
+
+write_restart   outputs/cascade_Fe_${runid}.restart

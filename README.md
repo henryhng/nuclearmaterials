@@ -1,6 +1,10 @@
-Testing nuclear materials via simulation, Garcia SRP 2026
+Nuclear Materials, Garcia SRP 2026
+
+
+# Week 1 - Simulation
 ## What it is
-10 keV PKA displacement cascades via LAMMPS simulation and OVITO visualization: 3C-SiC, Fe, and W
+- Testing nuclear materials via LAMMPS simulation
+- 10 keV PKA displacement cascades via LAMMPS simulation and OVITO visualization: 3C-SiC, Fe, and W
 ## Setup
 Needs an MPI build of LAMMPS, and Python 3.10-3.12
 ```py
