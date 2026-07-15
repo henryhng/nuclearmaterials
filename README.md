@@ -1,21 +1,24 @@
 Nuclear Materials, Garcia SRP 2026
 
+Engineered Microstructures and Radiation Effects Laboratory, Stony Brook University, Prof. David Sprouster
 
-# Week 1 - Simulation
-## What it is
+Henry Huang, Jonathan Symonds, Alessandro Verona
+
+## Week 1 - Simulation
+### Overview
 - Testing nuclear materials via LAMMPS simulation
 - 10 keV PKA displacement cascades via LAMMPS simulation and OVITO visualization: 3C-SiC, Fe, and W
-## Setup
+### Setup
 Needs an MPI build of LAMMPS, and Python 3.10-3.12
 ```py
 pip install -r analysis/requirements.txt
 export QT_QPA_PLATFORM=offscreen   # if headless
 ```
-## Run
+### Run
 ```py
 python3 run.py Fe --runs 1 --np 4
 ```
-## Figure generation
+### Figures
 ```py
 python3 analysis/thermo.py lammps/outputs/log.run_Fe_cascade_1 --outdir figures/thermo
 python3 analysis/evolution.py lammps/outputs/traj_Fe_spike_1.lammpstrj
