@@ -6,7 +6,7 @@ Mentor: Prof. David Sprouster
 
 Area: Synthesis, Characterization, & Testing of Nuclear Materials
 
-### Grain Boundary Characterization of Carbide Ceramics for Nuclear Fusion First-Wall Applications
+### Grain Boundary Characterization of Carbide Ceramics for Fusion First-Wall Applications
 Henry Huang, Jonathan Symonds, Alessandro Verona
 
 ## Week 1 - Simulation
