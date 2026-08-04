@@ -1,7 +1,12 @@
-Nuclear Materials, Garcia SRP 2026
+## Garcia SRP 2026
+### Background
+Location: Stony Brook University, Engineered Microstructures and Radiation Effects Laboratory
 
-Engineered Microstructures and Radiation Effects Laboratory, Stony Brook University, Prof. David Sprouster
+Mentor: Prof. David Sprouster
 
+Area: Synthesis, Characterization, & Testing of Nuclear Materials
+
+### Topic: Grain Boundary Characterization of Carbide Ceramics for Nuclear Fusion First-Wall Applications
 Henry Huang, Jonathan Symonds, Alessandro Verona
 
 ## Week 1 - Simulation
